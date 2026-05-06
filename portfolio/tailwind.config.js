@@ -8,13 +8,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: '#050a1a',
-        surface: '#0a1628',
-        accent: '#60a5fa',
-        'accent-hover': '#93c5fd',
-        'text-primary': '#e0f0ff',
-        'text-secondary': '#7aa3cc',
-        border: '#1a3a5c',
+        bg: '#0f0505',
+        surface: '#1a0808',
+        accent: '#ef4444',
+        'accent-hover': '#dc2626',
+        'text-primary': '#fef2f2',
+        'text-secondary': '#a87070',
+        border: '#3d1515',
       },
       fontFamily: {
         heading: ['Roboto', 'sans-serif'],

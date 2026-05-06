@@ -1,11 +1,11 @@
 export default function Footer() {
   return (
-    <footer className="border-t border-[#1a3a5c] py-8 px-6">
+    <footer className="border-t border-[#3d1515] py-8 px-6">
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="text-[#7aa3cc] font-body text-sm">
-          © 2026 <span className="bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">Maulana Al-Ghiffari</span>. All rights reserved.
+        <p className="text-[#a87070] font-body text-sm">
+          © 2026 <span className="bg-gradient-to-r from-red-400 to-rose-500 bg-clip-text text-transparent">Maulana Al-Ghiffari</span>. All rights reserved.
         </p>
-        <p className="text-[#7aa3cc] font-body text-xs">
+        <p className="text-[#a87070] font-body text-xs">
           Built with React + Vite + Tailwind CSS
         </p>
       </div>

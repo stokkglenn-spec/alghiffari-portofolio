@@ -17,7 +17,7 @@ function App() {
 
   return (
     <div className="dark">
-      <div className="bg-[#050a1a] min-h-screen transition-colors duration-300">
+      <div className="bg-[#0f0505] min-h-screen transition-colors duration-300">
         <Navbar />
         <Hero />
         <About />
