@@ -1,49 +1,84 @@
+import { useEffect, useRef, useState } from 'react'
+import { useLang } from '../context/LanguageContext'
+import useTilt from '../hooks/useTilt'
+
 const skillGroups = [
   {
     category: 'Languages',
-    color: 'from-blue-400 to-cyan-400',
+    color: 'from-red-400 to-rose-400',
     items: [
-      { name: 'HTML', icon: '🌐' },
-      { name: 'CSS', icon: '🎨' },
-      { name: 'JavaScript', icon: '⚡' },
+      { name: 'HTML',       icon: '🌐', percent: 85, color: 'from-red-500 to-rose-400' },
+      { name: 'CSS',        icon: '🎨', percent: 80, color: 'from-rose-500 to-pink-400' },
+      { name: 'JavaScript', icon: '⚡', percent: 60, color: 'from-orange-500 to-red-400' },
     ],
   },
   {
     category: 'Operating System',
-    color: 'from-violet-400 to-pink-400',
+    color: 'from-rose-400 to-red-300',
     items: [
-      { name: 'macOS', icon: '🍎' },
+      { name: 'macOS', icon: '🍎', percent: 90, color: 'from-red-400 to-rose-300' },
     ],
   },
 ]
 
-export default function Skills() {
+function SkillBar({ skill, animate }) {
+  const { ref, onMouseMove, onMouseLeave } = useTilt(8)
   return (
-    <section id="skills" className="py-24 px-6 bg-[#0a1628]">
+    <div
+      ref={ref}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      className="glass rounded-xl p-4 cursor-default"
+      style={{ willChange: 'transform' }}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xl">{skill.icon}</span>
+          <span className="text-[#fef2f2] font-body text-sm font-medium">{skill.name}</span>
+        </div>
+        <span className="text-[#a87070] font-body text-xs font-semibold">{skill.percent}%</span>
+      </div>
+      <div className="h-1.5 bg-[#3d1515]/60 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full bg-gradient-to-r ${skill.color} transition-all duration-1000 ease-out`}
+          style={{ width: animate ? `${skill.percent}%` : '0%' }}
+        ></div>
+      </div>
+    </div>
+  )
+}
+
+export default function Skills() {
+  const { t } = useLang()
+  const [animate, setAnimate] = useState(false)
+  const sectionRef = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setAnimate(true) },
+      { threshold: 0.3 }
+    )
+    if (sectionRef.current) observer.observe(sectionRef.current)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <section id="skills" ref={sectionRef} className="py-24 px-6 bg-[#1a0808]">
       <div className="max-w-6xl mx-auto">
         <div data-aos="fade-up" className="mb-16">
-          <p className="text-[#7aa3cc] text-sm tracking-widest uppercase font-body mb-2">What I work with</p>
-          <h2 className="font-heading font-black text-4xl md:text-5xl bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 bg-clip-text text-transparent">Skills</h2>
-          <div className="w-12 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 mt-4"></div>
+          <h2 className="font-heading font-black text-4xl md:text-5xl bg-gradient-to-r from-red-400 to-rose-500 bg-clip-text text-transparent">{t.skills.title}</h2>
+          <div className="w-12 h-0.5 bg-gradient-to-r from-red-400 to-rose-500 mt-4"></div>
         </div>
 
         <div className="space-y-12">
           {skillGroups.map((group, gi) => (
             <div key={group.category} data-aos="fade-up" data-aos-delay={gi * 100}>
               <h3 className={`font-heading font-bold text-lg bg-gradient-to-r ${group.color} bg-clip-text text-transparent mb-6`}>
-                {group.category}
+                {t.skills.categories[group.category] || group.category}
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {group.items.map((item, i) => (
-                  <div
-                    key={item.name}
-                    data-aos="fade-up"
-                    data-aos-delay={gi * 100 + i * 60}
-                    className="bg-[#050a1a] border border-[#1a3a5c] rounded-xl p-4 flex flex-col items-center gap-2 hover:-translate-y-1 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200 cursor-default"
-                  >
-                    <span className="text-2xl">{item.icon}</span>
-                    <span className="text-[#e0f0ff] font-body text-sm text-center">{item.name}</span>
-                  </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {group.items.map((item) => (
+                  <SkillBar key={item.name} skill={item} animate={animate} />
                 ))}
               </div>
             </div>
