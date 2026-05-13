@@ -1,22 +1,42 @@
 import { useState, useEffect } from 'react'
-
-const navLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'Skills', href: '#skills' },
-  { label: 'Portfolio', href: '#portfolio' },
-  { label: 'Certificates', href: '#certificates' },
-  { label: 'Contact', href: '#contact' },
-]
+import { useLang } from '../context/LanguageContext'
+import { useTheme } from '../context/ThemeContext'
 
 export default function Navbar() {
+  const { t, lang, toggleLang } = useLang()
+  const { isDark, toggleTheme } = useTheme()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [time, setTime] = useState('')
+
+  const navLinks = [
+    { label: t.nav.home,         href: '#home' },
+    { label: t.nav.about,        href: '#about' },
+    { label: t.nav.skills,       href: '#skills' },
+    { label: t.nav.portfolio,    href: '#portfolio' },
+    { label: t.nav.certificates, href: '#certificates' },
+    { label: t.nav.experience,   href: '#experience' },
+    { label: t.nav.contact,      href: '#contact' },
+  ]
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date().toLocaleTimeString('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false,
+      })
+      setTime(now)
+    }
+    tick()
+    const interval = setInterval(tick, 1000)
+    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -28,7 +48,7 @@ export default function Navbar() {
           Alghiffari
         </a>
 
-        <ul className="hidden md:flex items-center gap-8">
+        <ul className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <li key={link.label}>
               <a href={link.href} className="text-[#a87070] hover:text-[#ef4444] transition-colors duration-200 text-sm font-body">
@@ -38,9 +58,62 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-3">
+          {/* Semarang Clock */}
+          <div className="flex items-center gap-1.5 text-[#a87070] font-body text-xs border border-[#3d1515] px-3 py-1.5 rounded-full">
+            <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
+            <span>Semarang</span>
+            <span className="text-[#fef2f2] font-mono">{time}</span>
+          </div>
+
+          {/* Language Toggle */}
           <button
-            className="md:hidden text-[#ef4444]"
+            onClick={toggleLang}
+            title="Toggle language"
+            className="flex items-center gap-1.5 border border-[#3d1515] px-3 py-1.5 rounded-full text-[#a87070] hover:text-[#ef4444] hover:border-red-500/50 transition-all text-xs font-body"
+          >
+            <span className="text-base leading-none">{lang === 'id' ? '🇮🇩' : '🇬🇧'}</span>
+            <span className="font-semibold">{lang === 'id' ? 'ID' : 'EN'}</span>
+          </button>
+
+          {/* Dark/Light Toggle */}
+          <button
+            onClick={toggleTheme}
+            title="Toggle theme"
+            className="w-8 h-8 rounded-full border border-[#3d1515] flex items-center justify-center text-[#a87070] hover:text-[#ef4444] hover:border-red-500/50 transition-all"
+          >
+            {isDark ? (
+              /* Sun icon */
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+              </svg>
+            ) : (
+              /* Moon icon */
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
+          </button>
+        </div>
+
+        {/* Mobile hamburger */}
+        <div className="flex md:hidden items-center gap-2">
+          <button onClick={toggleLang} className="text-lg">
+            {lang === 'id' ? '🇮🇩' : '🇬🇧'}
+          </button>
+          <button onClick={toggleTheme} className="text-[#a87070]">
+            {isDark ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
+          </button>
+          <button
+            className="text-[#ef4444]"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
           >

@@ -1,8 +1,13 @@
-const contacts = [
+import { useState } from 'react'
+import { useLang } from '../context/LanguageContext'
+import useTilt from '../hooks/useTilt'
+
+const contactsMeta = [
   {
-    label: 'Email',
+    key: 'Email',
     value: 'maulanaalghiffari50@gmail.com',
-    href: 'mailto:maulanaalghiffari50@gmail.com',
+    href: 'https://mail.google.com/mail/?view=cm&to=maulanaalghiffari50@gmail.com&su=Halo%20Maulana',
+    copyable: true,
     color: 'text-red-400 border-red-900 group-hover:border-red-400',
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -11,7 +16,7 @@ const contacts = [
     ),
   },
   {
-    label: 'WhatsApp',
+    key: 'WhatsApp',
     value: '+62 811 286 7776',
     href: 'https://wa.me/628112867776',
     color: 'text-green-400 border-green-900 group-hover:border-green-400',
@@ -22,7 +27,7 @@ const contacts = [
     ),
   },
   {
-    label: 'LinkedIn',
+    key: 'LinkedIn',
     value: 'Maulana Al Ghiffari',
     href: 'https://www.linkedin.com/in/maulana-al-ghiffari-832495396',
     color: 'text-sky-400 border-sky-900 group-hover:border-sky-400',
@@ -33,7 +38,7 @@ const contacts = [
     ),
   },
   {
-    label: 'GitHub',
+    key: 'GitHub',
     value: '@Maulan1',
     href: 'https://github.com/Maulan1',
     color: 'text-rose-400 border-rose-900 group-hover:border-rose-400',
@@ -44,7 +49,7 @@ const contacts = [
     ),
   },
   {
-    label: 'Instagram',
+    key: 'Instagram',
     value: '@alghiffarii._',
     href: 'https://instagram.com/alghiffarii._',
     color: 'text-pink-400 border-pink-900 group-hover:border-pink-400',
@@ -56,31 +61,63 @@ const contacts = [
   },
 ]
 
-export default function Contact() {
+function ContactCard({ contact, copied, onCopy }) {
+  const { ref, onMouseMove, onMouseLeave } = useTilt(8)
+
+  return (
+    <a
+      ref={ref}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      href={contact.href}
+      target={contact.href.startsWith('https://mail') ? '_self' : '_blank'}
+      rel="noopener noreferrer"
+      onClick={contact.copyable ? onCopy : undefined}
+      className="glass rounded-2xl p-6 flex items-center gap-4 hover:shadow-xl transition-shadow duration-200 group relative"
+      style={{ willChange: 'transform' }}
+    >
+      <div className={`w-10 h-10 rounded-xl bg-[#0f0505]/60 border ${contact.color} flex items-center justify-center transition-colors flex-shrink-0`}>
+        {contact.icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-[#a87070] font-body text-xs mb-0.5">{contact.key}</p>
+        <p className="text-[#fef2f2] font-body text-sm truncate">{contact.value}</p>
+      </div>
+      {contact.copyable && (
+        <div className={`absolute top-2 right-3 text-xs font-body px-2 py-0.5 rounded-full transition-all duration-300 ${copied ? 'bg-green-500/20 text-green-400 opacity-100' : 'opacity-0'}`}>
+          ✓ Copied!
+        </div>
+      )}
+    </a>
+  )
+}
+
+export default function Contact({ showToast }) {
+  const { t } = useLang()
+  const [copied, setCopied] = useState(false)
+
+  const copyEmail = (e) => {
+    e.preventDefault()
+    navigator.clipboard.writeText('maulanaalghiffari50@gmail.com')
+    setCopied(true)
+    if (showToast) showToast(t.contact.toastCopied, 'success')
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <section id="contact" className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
         <div data-aos="fade-up" className="mb-16">
-          <p className="text-[#a87070] text-sm tracking-widest uppercase font-body mb-2">Let's connect</p>
-          <h2 className="font-heading font-black text-4xl md:text-5xl bg-gradient-to-r from-red-400 to-rose-500 bg-clip-text text-transparent">Get in Touch</h2>
+          <p className="text-[#a87070] text-sm tracking-widest uppercase font-body mb-2">{t.contact.subtitle}</p>
+          <h2 className="font-heading font-black text-4xl md:text-5xl bg-gradient-to-r from-red-400 to-rose-500 bg-clip-text text-transparent">{t.contact.title}</h2>
           <div className="w-12 h-0.5 bg-gradient-to-r from-red-400 to-rose-500 mt-4"></div>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {contacts.map((contact, i) => (
-            <a key={contact.label} href={contact.href}
-              target={contact.href.startsWith('mailto') ? '_self' : '_blank'}
-              rel="noopener noreferrer"
-              data-aos="fade-up" data-aos-delay={i * 80}
-              className="bg-[#1a0808] border border-[#3d1515] rounded-2xl p-6 flex items-center gap-4 hover:-translate-y-1 hover:shadow-xl transition-all duration-200 group">
-              <div className={`w-10 h-10 rounded-xl bg-[#0f0505] border ${contact.color} flex items-center justify-center transition-colors flex-shrink-0`}>
-                {contact.icon}
-              </div>
-              <div className="min-w-0">
-                <p className="text-[#a87070] font-body text-xs mb-0.5">{contact.label}</p>
-                <p className="text-[#fef2f2] font-body text-sm truncate">{contact.value}</p>
-              </div>
-            </a>
+          {contactsMeta.map((contact, i) => (
+            <div key={contact.key} data-aos="fade-up" data-aos-delay={i * 80}>
+              <ContactCard contact={contact} copied={copied} onCopy={copyEmail} />
+            </div>
           ))}
         </div>
       </div>

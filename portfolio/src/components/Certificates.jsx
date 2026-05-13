@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useLang } from '../context/LanguageContext'
+import useTilt from '../hooks/useTilt'
 
 const certificates = [
   {
@@ -37,9 +39,7 @@ const certificates = [
   {
     label: 'AI for Oceans — Hour of Code',
     issuer: 'Code.org',
-    org: 'Sponsored by Amazon',
-    date: '—',
-    icon: '🤖',
+    org: 'Disponsori oleh Amazon',
     gradient: 'from-cyan-500 to-teal-500',
     border: 'hover:border-cyan-500/50 hover:shadow-cyan-500/10',
     badge: 'bg-cyan-500/20 border-cyan-500/40 text-cyan-400',
@@ -48,7 +48,7 @@ const certificates = [
   {
     label: 'Music Lab: Jam Session — Hour of Code',
     issuer: 'Code.org',
-    org: 'Sponsored by Salesforce',
+    org: 'Disponsori oleh Salesforce',
     date: '—',
     icon: '🎵',
     gradient: 'from-pink-500 to-rose-500',
@@ -59,7 +59,7 @@ const certificates = [
   {
     label: 'The Hour of Code',
     issuer: 'Code.org',
-    org: 'Sponsored by AT&T',
+    org: 'Disponsori oleh AT&T',
     date: '—',
     icon: '📡',
     gradient: 'from-violet-500 to-purple-500',
@@ -70,7 +70,7 @@ const certificates = [
   {
     label: 'The Hour of Code',
     issuer: 'Code.org',
-    org: 'Sponsored by Blizzard',
+    org: 'Disponsori oleh Blizzard',
     date: '—',
     icon: '🎮',
     gradient: 'from-orange-500 to-amber-500',
@@ -81,7 +81,7 @@ const certificates = [
   {
     label: 'The Hour of Code',
     issuer: 'Code.org',
-    org: 'Sponsored by Microsoft',
+    org: 'Disponsori oleh Microsoft',
     date: '—',
     icon: '🪟',
     gradient: 'from-green-500 to-emerald-500',
@@ -92,7 +92,7 @@ const certificates = [
   {
     label: 'The Hour of Code',
     issuer: 'Code.org',
-    org: 'Sponsored by Infosys Foundation USA',
+    org: 'Disponsori oleh Infosys Foundation USA',
     date: '—',
     icon: '⚡',
     gradient: 'from-yellow-500 to-lime-500',
@@ -103,7 +103,7 @@ const certificates = [
   {
     label: 'The Hour of Code',
     issuer: 'Code.org',
-    org: 'Sponsored by Amazon',
+    org: 'Disponsori oleh Amazon',
     date: '—',
     icon: '☁️',
     gradient: 'from-sky-500 to-blue-500',
@@ -113,13 +113,21 @@ const certificates = [
   },
 ]
 
-function CertCard({ cert, onClick }) {
+function CertCard({ cert, onClick, clickLabel, noPreview, completedLabel }) {
   const [imgError, setImgError] = useState(false)
+  const { ref, onMouseMove, onMouseLeave } = useTilt(8)
+
   return (
-    <div onClick={() => onClick(cert)}
-      className={`bg-[#1a0808] border border-[#3d1515] rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-xl ${cert.border} transition-all duration-200 cursor-pointer`}>
+    <div
+      ref={ref}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      onClick={() => onClick(cert)}
+      className={`glass rounded-2xl overflow-hidden hover:shadow-xl ${cert.border} transition-shadow duration-200 cursor-pointer`}
+      style={{ willChange: 'transform' }}
+    >
       <div className={`h-1 w-full bg-gradient-to-r ${cert.gradient}`}></div>
-      <div className="h-36 bg-[#0f0505] overflow-hidden relative group">
+      <div className="h-36 bg-[#0f0505]/60 overflow-hidden relative group">
         {!imgError ? (
           <img src={cert.preview} alt={cert.label}
             className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
@@ -127,23 +135,23 @@ function CertCard({ cert, onClick }) {
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
             <span className="text-3xl">{cert.icon}</span>
-            <span className="text-xs text-[#a87070] font-body">No Preview</span>
+            <span className="text-xs text-[#a87070] font-body">{noPreview}</span>
           </div>
         )}
         <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
-          <span className="text-white text-xs font-body bg-black/50 px-3 py-1 rounded-full">Click to view</span>
+          <span className="text-white text-xs font-body bg-black/50 px-3 py-1 rounded-full">{clickLabel}</span>
         </div>
       </div>
       <div className="p-4">
         <span className={`text-xs px-2 py-0.5 rounded-full border font-body ${cert.badge}`}>{cert.issuer}</span>
         <p className="text-[#fef2f2] font-body text-sm font-semibold leading-snug mt-2 mb-1">{cert.label}</p>
         <p className="text-[#a87070] font-body text-xs">{cert.org}</p>
-        {cert.date !== '—' && <p className="text-[#fef2f2] font-body text-xs mt-1">{cert.date}</p>}
+        {cert.date && cert.date !== '—' && <p className="text-[#fef2f2] font-body text-xs mt-1">{cert.date}</p>}
         <div className="flex items-center gap-1 mt-2">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
           </svg>
-          <span className="text-green-400 font-body text-xs">Completed</span>
+          <span className="text-green-400 font-body text-xs">{completedLabel}</span>
         </div>
       </div>
     </div>
@@ -151,20 +159,28 @@ function CertCard({ cert, onClick }) {
 }
 
 export default function Certificates() {
+  const { t } = useLang()
   const [selected, setSelected] = useState(null)
+
   return (
     <section id="certificates" className="py-24 px-6 bg-[#1a0808]">
       <div className="max-w-6xl mx-auto">
         <div data-aos="fade-up" className="mb-16">
-          <p className="text-[#a87070] text-sm tracking-widest uppercase font-body mb-2">Achievements</p>
-          <h2 className="font-heading font-black text-4xl md:text-5xl bg-gradient-to-r from-red-400 to-rose-500 bg-clip-text text-transparent">Certificates</h2>
+          <p className="text-[#a87070] text-sm tracking-widest uppercase font-body mb-2">{t.certificates.subtitle}</p>
+          <h2 className="font-heading font-black text-4xl md:text-5xl bg-gradient-to-r from-red-400 to-rose-500 bg-clip-text text-transparent">{t.certificates.title}</h2>
           <div className="w-12 h-0.5 bg-gradient-to-r from-red-400 to-rose-500 mt-4"></div>
-          <p className="text-[#a87070] font-body text-sm mt-3">{certificates.length} certificates earned</p>
+          <p className="text-[#a87070] font-body text-sm mt-3">{t.certificates.count(certificates.length)}</p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {certificates.map((cert, i) => (
             <div key={i} data-aos="fade-up" data-aos-delay={i * 50}>
-              <CertCard cert={cert} onClick={setSelected} />
+              <CertCard
+                cert={cert}
+                onClick={setSelected}
+                clickLabel={t.certificates.clickToView}
+                noPreview={t.certificates.noPreview}
+                completedLabel={t.certificates.completed}
+              />
             </div>
           ))}
         </div>

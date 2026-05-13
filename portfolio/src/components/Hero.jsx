@@ -1,19 +1,23 @@
 import { useEffect, useRef } from 'react'
 import Typed from 'typed.js'
+import { useLang } from '../context/LanguageContext'
 
 export default function Hero() {
+  const { t } = useLang()
   const typedRef = useRef(null)
+  const typedInstance = useRef(null)
 
   useEffect(() => {
-    const typed = new Typed(typedRef.current, {
-      strings: ['Aspiring Software Engineer', 'Network Enthusiast', 'Web Developer'],
+    if (typedInstance.current) typedInstance.current.destroy()
+    typedInstance.current = new Typed(typedRef.current, {
+      strings: t.hero.typed,
       typeSpeed: 60,
       backSpeed: 40,
       backDelay: 2000,
       loop: true,
     })
-    return () => typed.destroy()
-  }, [])
+    return () => typedInstance.current?.destroy()
+  }, [t.hero.typed])
 
   return (
     <section id="home" className="min-h-screen flex items-center justify-center px-6 pt-20 relative overflow-hidden">
@@ -42,13 +46,12 @@ export default function Hero() {
       <div className="max-w-6xl mx-auto w-full grid md:grid-cols-2 gap-12 items-center relative z-10">
         {/* Text */}
         <div data-aos="fade-up">
-          {/* Availability badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/30 rounded-full mb-4">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            <span className="text-green-400 text-xs font-body font-medium">Available for opportunities</span>
+            <span className="text-green-400 text-xs font-body font-medium">{t.hero.available}</span>
           </div>
 
-          <p className="text-[#a87070] text-sm font-body mb-3 tracking-widest uppercase">Hello, I'm</p>
+          <p className="text-[#a87070] text-sm font-body mb-3 tracking-widest uppercase">{t.hero.greeting}</p>
           <h1 className="font-heading font-black text-5xl md:text-7xl leading-none mb-2">
             <span className="text-[#fef2f2]">Maulana</span><br />
             <span className="bg-gradient-to-r from-red-400 to-rose-500 bg-clip-text text-transparent">
@@ -61,52 +64,42 @@ export default function Hero() {
             </span>
           </div>
           <p className="text-[#a87070] font-body text-base leading-relaxed max-w-md mb-6">
-            A front-end focused web developer with a strong passion for crafting clean,
-            user-friendly interfaces. Driven by curiosity and a love for technology,
-            I'm on a journey to grow into a well-rounded software engineer — one line
-            of code at a time.
+            {t.hero.bio}
           </p>
 
           {/* Tech stack badges */}
           <div className="flex flex-wrap gap-2 mb-6">
-            <span className="px-3 py-1 bg-[#1a0808] border border-[#3d1515] text-[#a87070] text-xs font-body rounded-full hover:border-red-500/50 transition-colors">
-              HTML
-            </span>
-            <span className="px-3 py-1 bg-[#1a0808] border border-[#3d1515] text-[#a87070] text-xs font-body rounded-full hover:border-red-500/50 transition-colors">
-              CSS
-            </span>
-            <span className="px-3 py-1 bg-[#1a0808] border border-[#3d1515] text-[#a87070] text-xs font-body rounded-full hover:border-red-500/50 transition-colors">
-              JavaScript
-            </span>
-            <span className="px-3 py-1 bg-[#1a0808] border border-[#3d1515] text-[#a87070] text-xs font-body rounded-full hover:border-red-500/50 transition-colors">
-              IoT
-            </span>
+            {['HTML', 'CSS', 'JavaScript', 'IoT'].map(tech => (
+              <span key={tech} className="px-3 py-1 bg-[#1a0808] border border-[#3d1515] text-[#a87070] text-xs font-body rounded-full hover:border-red-500/50 transition-colors">
+                {tech}
+              </span>
+            ))}
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mb-8">
             <div className="text-center">
               <p className="text-2xl font-heading font-bold text-[#ef4444]">10+</p>
-              <p className="text-xs text-[#a87070] font-body">Certificates</p>
+              <p className="text-xs text-[#a87070] font-body">{t.hero.stats.certs}</p>
             </div>
             <div className="text-center border-x border-[#3d1515]">
               <p className="text-2xl font-heading font-bold text-[#ef4444]">2</p>
-              <p className="text-xs text-[#a87070] font-body">Projects</p>
+              <p className="text-xs text-[#a87070] font-body">{t.hero.stats.projects}</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-heading font-bold text-[#ef4444]">2024</p>
-              <p className="text-xs text-[#a87070] font-body">Started</p>
+              <p className="text-xs text-[#a87070] font-body">{t.hero.stats.since}</p>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-4">
             <a href="#portfolio"
               className="px-6 py-3 border border-[#ef4444] text-[#ef4444] font-body text-sm rounded hover:bg-[#ef4444] hover:text-white transition-all duration-200">
-              View My Work
+              {t.hero.viewWork}
             </a>
             <a href="#contact"
               className="px-6 py-3 border border-[#3d1515] text-[#a87070] font-body text-sm rounded hover:border-[#ef4444] hover:text-[#ef4444] transition-all duration-200">
-              Get in Touch
+              {t.hero.contact}
             </a>
           </div>
 
@@ -147,7 +140,7 @@ export default function Hero() {
 
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
-        <span className="text-[#a87070] text-xs font-body">Scroll</span>
+        <span className="text-[#a87070] text-xs font-body">{t.hero.scroll}</span>
         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-[#ef4444]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
         </svg>
